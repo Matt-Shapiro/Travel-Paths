@@ -1,8 +1,8 @@
 #include "Graph.h"
 
-void Graph::allocateMatrix(int numCities){
-	this -> numCities = numCities;
-	matrix = new int*[numCities];
+void Graph::allocateMatrix(int numCities){		//Implementing an adjacency matrix
+	this -> numCities = numCities;			//Easier for checking for a certain path between two cities rather than
+	matrix = new int*[numCities];			//looping through a linked list
 	for (int i = 0; i < numCities ; i++){
 		matrix[i] = new int[numCities];
 	}
@@ -22,22 +22,22 @@ int Graph::findIndex(string s){
 	}
 }
 
-void Graph::homePath(City home){
+void Graph::homePath(City home){		//breadth first search - each path has the same weight - no need for dijkstras
 	bool foundHome = false;
-	home.setColor(GRAY);
-	home.setDistance(0);
-	home.setPi(NULL);
-	queue<City> Q;
-	Q.push(home);
+	home.setColor(GRAY);			//indicates not fully explored yet
+	home.setDistance(0);			
+	home.setPi(NULL); 
+	queue<City> Q; 				//FIFO queue - Cities closest to home should be explored first
+	Q.push(home);				
 	while (!Q.empty()){
 		int f = findIndex(Q.front().getName());
 		for (int i = 0; i < reference.size(); i++){
 			if (matrix[f][i] == 1){ //if there is a path to this city
-				if (reference[i].getName() == home.getName()){
+				if (reference[i].getName() == home.getName()){		//check if its the home city	
 					foundHome = true;
-					stack<string> output;
-					cout << reference[i].getName() << ' ';
-					City* cp;
+					stack<string> output;				//LIFO - travelling back through pi		
+					cout << reference[i].getName() << ' ';		//means that the path will read backwards
+					City* cp;					//a stack switches the order back to the right way
 					for (cp = &Q.front(); cp -> getPi() != NULL; cp = cp -> getPi()){
 						output.push(cp -> getName());
 					}	
@@ -46,7 +46,7 @@ void Graph::homePath(City home){
 						output.pop();
 					}
 					cout << home.getName() << endl;
-				} else if (reference[i].getColor() == WHITE){
+				} else if (reference[i].getColor() == WHITE){		//Add new city to the queue
 					reference[i].setColor(GRAY);
 					reference[i].setDistance(Q.front().getDistance() + 1);
 					reference[i].setPi(&Q.front()); 
@@ -54,15 +54,15 @@ void Graph::homePath(City home){
 				}
 			}
 		}
-		Q.front().setColor(BLACK);
+		Q.front().setColor(BLACK);		//fully explored
 		Q.pop();
 	}
 	if (!foundHome)
-		cout << "no" << endl;	
+		cout << "no" << endl;			//graph fully explored and haven't found city
 }
 
-void Graph::travel(City c1, City c2){
-	bool foundCity;
+void Graph::travel(City c1, City c2){			//same implementation as homePath except stop search after
+	bool foundCity;					//finding c2 instead of home again
 	c1.setColor(GRAY);
 	c1.setPi(NULL);
 	c1.setDistance(0);
